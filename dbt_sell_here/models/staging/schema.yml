@@ -1,0 +1,21 @@
+
+version: 2
+
+models:
+  - name: stg_active_members
+    description: "staging layer of the active members table"
+    columns:
+      - name: customer_id
+        description: Id of the member
+
+  - name: stg_new_members
+    description: "staging layer of the new members table"
+    columns:
+      - name: customer_id
+        description: Id of the member
+
+  - name: stg_subscriptions
+    description: "staging layer of the subscribers table"
+    columns:
+      - name: customer_id
+        description: Id of the member

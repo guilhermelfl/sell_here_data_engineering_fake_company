@@ -1,0 +1,11 @@
+version: 2
+
+sources:
+  - name: sell_here
+    description: "This is the postgres original database"
+    tables:
+      - name: customers
+      - name: products
+      - name: reseller_products
+      - name: reseller
+      - name: sales
