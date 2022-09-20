@@ -4,7 +4,7 @@ create table IF NOT EXISTS sell_here.reseller
 (
 reseller_cnpj VARCHAR (255) primary key,
 reseller_name VARCHAR ( 255 ) not null,
-agreed_rate_pct int not null,
+agreed_rate_pct float not null,
 creation_date date not null
 );
 
@@ -57,3 +57,4 @@ CONSTRAINT fk_sales_product_id FOREIGN KEY(product_id) REFERENCES sell_here.prod
 
 
 create schema IF NOT EXISTS dw;
+create schema IF NOT EXISTS external_data;

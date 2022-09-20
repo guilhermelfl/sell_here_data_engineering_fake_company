@@ -9,3 +9,8 @@ sources:
       - name: reseller_products
       - name: reseller
       - name: sales
+
+  - name: external_data
+    description: "Sources ingested directly into our datawarehouse"
+    tables:
+      - name: external_reseller_sales
