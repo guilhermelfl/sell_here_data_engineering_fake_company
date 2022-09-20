@@ -37,7 +37,7 @@ def create_reseller_data(fake, creation_date):
     res_row = {}
     res_row['reseller_cnpj'] = fake.unique.cnpj()
     res_row['reseller_name'] = fake.bs()
-    res_row['agreed_rate_pct'] = random.uniform(5,10)
+    res_row['agreed_rate_pct'] = random.uniform(0.05,0.10)
     res_row['creation_date'] = creation_date
 
     return res_row
@@ -67,8 +67,10 @@ def create_reseller_products_data(fake, random_prod, random_res, creation_date):
     return sup_prod_row
 
 
-def create_sales_data(fake, cust_cpf, res_prod_dict, creation_date):
+def create_sales_data(fake, cust_cpf, res_prod_dict, creation_date, external_sales = False):
     payment_type_list = ['Debit','Credit','Pix']
+    if external_sales:
+        payment_type_list.append('Cash')
     sales_row = {}
     sales_row['sales_id'] = uuid.uuid4()
     sales_row['sales_datetime'] = creation_date + timedelta(hours = random.randint(0,23), minutes=random.randint(0,59), seconds = random.randint(0,59))
@@ -131,14 +133,15 @@ def generate_data():
             random_reseller_dict = list_reseller_dict[random.randint(0,len(list_reseller_dict)-1)]
             random_reseller = random_reseller_dict['reseller_cnpj']
             choose_df = pd.DataFrame(list_reseller_products_dict)
-            choose_df.query(f'reseller_cnpj == "{random_reseller}"')
+            choose_df = choose_df[choose_df['reseller_cnpj'] == f"{random_reseller}"]
             list_resel_sales_dict = []
-            for j in range(random.randint(1,25)):
-                customer_random_cpf = list_cust_dict[random.randint(0,len(list_cust_dict)-1)]
-                list_resel_sales_dict.append(create_sales_data(fake,customer_random_cpf['customer_cpf'],choose_df.sample(1).to_dict(orient='records')[0],iter_date))
-            new_reseller_file_df = pd.DataFrame(list_resel_sales_dict)
-            clean_cnpj = random_reseller.replace('/','').replace('-','').replace('.','')
-            new_reseller_file_df.to_excel(f'{dir_name}/{iter_date}_{clean_cnpj}.xlsx',header=True, index=False)
+            if not choose_df.empty:
+                for j in range(random.randint(1,25)):
+                    customer_random_cpf = list_cust_dict[random.randint(0,len(list_cust_dict)-1)]
+                    list_resel_sales_dict.append(create_sales_data(fake,customer_random_cpf['customer_cpf'],choose_df.sample(1).to_dict(orient='records')[0],iter_date, True))
+                new_reseller_file_df = pd.DataFrame(list_resel_sales_dict)
+                clean_cnpj = random_reseller.replace('/','').replace('-','').replace('.','')
+                new_reseller_file_df.to_excel(f'{dir_name}/{iter_date}_{clean_cnpj}.xlsx',header=True, index=False)
 
 
     engine = create_engine('postgresql://postgres:postgres@localhost:5432/postgres')
