@@ -6,6 +6,7 @@ from math import floor
 import uuid
 from sqlalchemy import create_engine
 import os
+import shutil
 
 def create_products_data(fake, creation_date):
     category_list = ['Home & Kitchen', 
@@ -85,6 +86,7 @@ def generate_data():
     today = date.today()
     iter_date = today - timedelta(days=730)
     dir_name = 'reseller_files'
+    shutil.rmtree(f'{dir_name}',ignore_errors=True)
     os.makedirs(f'{dir_name}', exist_ok=False)
 
     list_cust_dict = []
@@ -98,7 +100,7 @@ def generate_data():
         print(f'generating data for date: {iter_date}')
 
         #creating customers data
-        for i in range(random.randint(1,100)):
+        for i in range(random.randint(1,120)):
             list_cust_dict.append(create_customers_data(fake,iter_date))
 
         #creating reseller data
@@ -106,7 +108,7 @@ def generate_data():
             list_reseller_dict.append(create_reseller_data(fake,iter_date))
 
         #creating products data
-        for i in range(random.randint(1,10)):
+        for i in range(random.randint(1,13)):
             list_products_dict.append(create_products_data(fake,iter_date))
 
         #creating supplier_products data
@@ -118,7 +120,7 @@ def generate_data():
         #creating sales data
         #to scale sales with customers It'll be used with customer %
         
-        for i in range(random.randint(2,25+ floor( len(list_cust_dict)  *random.uniform(0.005,0.03) ) ) ):
+        for i in range(random.randint(2,25+ floor( len(list_cust_dict)  *random.uniform(0.01,0.03) ) ) ):
             customer_random_cpf = list_cust_dict[random.randint(0,len(list_cust_dict)-1)]
             random_res_prod = list_reseller_products_dict[random.randint(0,len(list_reseller_products_dict)-1)]
             list_sales_dict.append(create_sales_data(fake,customer_random_cpf['customer_cpf'],random_res_prod,iter_date))
@@ -131,7 +133,7 @@ def generate_data():
             choose_df = pd.DataFrame(list_reseller_products_dict)
             choose_df.query(f'reseller_cnpj == "{random_reseller}"')
             list_resel_sales_dict = []
-            for j in range(random.randint(1,15)):
+            for j in range(random.randint(1,25)):
                 customer_random_cpf = list_cust_dict[random.randint(0,len(list_cust_dict)-1)]
                 list_resel_sales_dict.append(create_sales_data(fake,customer_random_cpf['customer_cpf'],choose_df.sample(1).to_dict(orient='records')[0],iter_date))
             new_reseller_file_df = pd.DataFrame(list_resel_sales_dict)
