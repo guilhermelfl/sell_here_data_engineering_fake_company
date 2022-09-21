@@ -47,12 +47,12 @@ def create_customers_data(fake, creation_date):
     #document_number
     customer_row = {}
     customer_row['customer_cpf'] = fake.unique.cpf()
+    customer_row['customer_user_name'] = fake.unique.user_name()
     customer_row['customer_name'] = fake.name()
     customer_row['customer_address'] = fake.address().replace('\n','|')
     customer_row['customer_email'] = fake.email()
     customer_row['birth_date'] = fake.date_of_birth(minimum_age = 21, maximum_age = 65)
     customer_row['creation_date'] = creation_date
-
 
 
     return customer_row
@@ -82,14 +82,18 @@ def create_sales_data(fake, cust_cpf, res_prod_dict, creation_date, external_sal
     sales_row['creation_date'] = creation_date
     return sales_row
 
+def create_weblog_app_data(fake):
+    pass
+
 def generate_data():
     fake = Faker('pt_BR')
     fake.random.seed(42)
     today = date.today()
     iter_date = today - timedelta(days=730)
-    dir_name = 'reseller_files'
-    shutil.rmtree(f'{dir_name}',ignore_errors=True)
-    os.makedirs(f'{dir_name}', exist_ok=False)
+    excel_dir_name = 'reseller_files'
+    weblog_dir_name = 'weblog_files'
+    shutil.rmtree(f'{excel_dir_name}',ignore_errors=True)
+    os.makedirs(f'{excel_dir_name}', exist_ok=False)
 
     list_cust_dict = []
     list_reseller_dict = []
@@ -141,7 +145,7 @@ def generate_data():
                     list_resel_sales_dict.append(create_sales_data(fake,customer_random_cpf['customer_cpf'],choose_df.sample(1).to_dict(orient='records')[0],iter_date, True))
                 new_reseller_file_df = pd.DataFrame(list_resel_sales_dict)
                 clean_cnpj = random_reseller.replace('/','').replace('-','').replace('.','')
-                new_reseller_file_df.to_excel(f'{dir_name}/{iter_date}_{clean_cnpj}.xlsx',header=True, index=False)
+                new_reseller_file_df.to_excel(f'{excel_dir_name}/{iter_date}_{clean_cnpj}.xlsx',header=True, index=False)
 
 
     engine = create_engine('postgresql://postgres:postgres@localhost:5432/postgres')

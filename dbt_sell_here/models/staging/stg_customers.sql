@@ -11,6 +11,7 @@
 
 SELECT 
 customer_cpf, 
+customer_user_name, 
 customer_name, 
 customer_address, 
 right(customer_address,2) as customer_state, 

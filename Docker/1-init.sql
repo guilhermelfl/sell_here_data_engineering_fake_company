@@ -32,6 +32,7 @@ UNIQUE (product_id, reseller_cnpj)
 create table IF NOT EXISTS sell_here.customers
 (
 customer_cpf VARCHAR (255) primary key,
+customer_user_name VARCHAR (255) not null,
 customer_name VARCHAR (255) not null,
 customer_address VARCHAR (255) not null,
 customer_email VARCHAR (255) not null,
