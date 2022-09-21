@@ -1,7 +1,8 @@
 from faker import Faker
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 import random
 import pandas as pd
+import numpy as np
 from math import floor
 import uuid
 from sqlalchemy import create_engine
@@ -73,7 +74,12 @@ def create_sales_data(fake, cust_cpf, res_prod_dict, creation_date, external_sal
         payment_type_list.append('Cash')
     sales_row = {}
     sales_row['sales_id'] = uuid.uuid4()
-    sales_row['sales_datetime'] = creation_date + timedelta(hours = random.randint(0,23), minutes=random.randint(0,59), seconds = random.randint(0,59))
+    sales_row['sales_datetime'] = datetime(year=creation_date.year,
+                                            month=creation_date.month,
+                                            day=creation_date.day,
+                                            hour=random.randint(0,23),
+                                            minute=random.randint(0,59),
+                                            second= random.randint(0,59))
     sales_row['reseller_cnpj'] = res_prod_dict['reseller_cnpj']
     sales_row['product_id'] = res_prod_dict['product_id']
     sales_row['customer_cpf'] = cust_cpf
@@ -82,8 +88,28 @@ def create_sales_data(fake, cust_cpf, res_prod_dict, creation_date, external_sal
     sales_row['creation_date'] = creation_date
     return sales_row
 
-def create_weblog_app_data(fake):
-    pass
+def create_weblog_app_data(fake, user_name, creation_date):
+    verb=["GET","POST","DELETE","PUT"]
+    response=["200","404","500","301"]
+    ualist = [fake.firefox, fake.chrome, fake.safari, fake.internet_explorer, fake.opera]
+
+
+    weblog_row = {}
+    weblog_row['identifier'] = uuid.uuid4()
+    weblog_row['client_ip'] = fake.ipv4()
+    weblog_row['user_name'] = user_name
+    weblog_row['received_date_time'] = datetime(year=creation_date.year,
+                                            month=creation_date.month,
+                                            day=creation_date.day,
+                                            hour=random.randint(0,23),
+                                            minute=random.randint(0,59),
+                                            second= random.randint(0,59))
+    weblog_row['request_line'] = np.random.choice(verb,p=[0.6,0.1,0.1,0.2])
+    weblog_row['server_response'] = np.random.choice(response,p=[0.9,0.04,0.02,0.04])
+    weblog_row['response_size_in_bytes'] = int(random.gauss(5000,50))
+    weblog_row['referer'] = fake.uri()
+    weblog_row['user_agent'] = np.random.choice(ualist,p=[0.5,0.3,0.1,0.05,0.05])
+    return weblog_row
 
 def generate_data():
     fake = Faker('pt_BR')
@@ -93,7 +119,9 @@ def generate_data():
     excel_dir_name = 'reseller_files'
     weblog_dir_name = 'weblog_files'
     shutil.rmtree(f'{excel_dir_name}',ignore_errors=True)
+    shutil.rmtree(f'{weblog_dir_name}',ignore_errors=True)
     os.makedirs(f'{excel_dir_name}', exist_ok=False)
+    os.makedirs(f'{weblog_dir_name}', exist_ok=False)
 
     list_cust_dict = []
     list_reseller_dict = []
@@ -146,6 +174,19 @@ def generate_data():
                 new_reseller_file_df = pd.DataFrame(list_resel_sales_dict)
                 clean_cnpj = random_reseller.replace('/','').replace('-','').replace('.','')
                 new_reseller_file_df.to_excel(f'{excel_dir_name}/{iter_date}_{clean_cnpj}.xlsx',header=True, index=False)
+
+        list_webapp_dict = []
+        for i in range(random.randint(25+floor(len(list_cust_dict) *0.05), 25+floor(len(list_cust_dict)*0.15))): #between 5 to 15% of the customers + 25
+            customer_random_user_name = list_cust_dict[random.randint(0,len(list_cust_dict)-1)]
+            list_webapp_dict.append(create_weblog_app_data(fake, customer_random_user_name['customer_user_name'], iter_date))
+        #ordering and writing the log
+        list_webapp_dict = sorted(list_webapp_dict, key=lambda d: d['received_date_time'])
+
+        file = open(f'{weblog_dir_name}/{iter_date}_webapp.log','w')
+        for line in list_webapp_dict:
+            file.write(f"{line['client_ip']} {line['identifier']} {line['user_name']} {line['received_date_time']} " + '"' + f"{line['request_line']}" + '" ' + \
+                        f"{line['server_response']} {line['response_size_in_bytes']}" + ' "' + f"{line['referer']}" + '" ' + f"{line['user_agent']}\n")
+        file.flush()
 
 
     engine = create_engine('postgresql://postgres:postgres@localhost:5432/postgres')
