@@ -23,6 +23,7 @@ Sales made from the sell_here website charge the reseller the `agreed_rate_pct` 
 |Customer|
 | ------ |
 |customer_cpf|
+|customer_user_name|
 |customer_name|
 |customer_address|
 |customer_email|
