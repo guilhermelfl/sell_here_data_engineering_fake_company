@@ -3,6 +3,10 @@
 
 #### Data Engineering project
 
+This is a data engineering project creating an idea of a batch pipeline to help the work of data team.
+
+In this project Data will be generated, ingested, treated and joined to deliver a clean and reliable source to Data Scientists and Data Analysts to work on.
+
 ## What is sell here?
 
 Sell Here is a fake web platform to help companies sell their products through sell_here website.
@@ -137,7 +141,7 @@ To deal with transformations and business rules [DBT](https://www.getdbt.com/) w
 
 After the pipeline run we can get to our final layer: 
 
-- `ins_sales`, Table with some joins and transformations to get insights from.
+- `ins_sales`, Table with some joins and transformations to get insights from sales. It'll have one line per sale with info from the reseller, customer, product and sale.
 
-- `ins_user_usage.sql`, Table with web app logs data joining with some client info
+- `ins_user_usage.sql`, Table with web app logs data joining with some client info. This table has information about date and time of the web app usage, the user-agent used to connect the app
 
