@@ -14,3 +14,4 @@ sources:
     description: "Sources ingested directly into our datawarehouse"
     tables:
       - name: external_reseller_sales
+      - name: web_app_logs

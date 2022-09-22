@@ -91,7 +91,7 @@ def create_sales_data(fake, cust_cpf, res_prod_dict, creation_date, external_sal
 def create_weblog_app_data(fake, user_name, creation_date):
     verb=["GET","POST","DELETE","PUT"]
     response=["200","404","500","301"]
-    ualist = [fake.firefox, fake.chrome, fake.safari, fake.internet_explorer, fake.opera]
+    ualist = [fake.firefox(), fake.chrome(), fake.safari(), fake.internet_explorer(), fake.opera()]
 
 
     weblog_row = {}
@@ -176,7 +176,7 @@ def generate_data():
                 new_reseller_file_df.to_excel(f'{excel_dir_name}/{iter_date}_{clean_cnpj}.xlsx',header=True, index=False)
 
         list_webapp_dict = []
-        for i in range(random.randint(25+floor(len(list_cust_dict) *0.05), 25+floor(len(list_cust_dict)*0.15))): #between 5 to 15% of the customers + 25
+        for i in range(random.randint(1+floor(len(list_cust_dict) *0.03), 1+floor(len(list_cust_dict)*0.07))): #between 1+3% to 1+7% of the customers
             customer_random_user_name = list_cust_dict[random.randint(0,len(list_cust_dict)-1)]
             list_webapp_dict.append(create_weblog_app_data(fake, customer_random_user_name['customer_user_name'], iter_date))
         #ordering and writing the log
@@ -187,7 +187,6 @@ def generate_data():
             file.write(f"{line['client_ip']} {line['identifier']} {line['user_name']} {line['received_date_time']} " + '"' + f"{line['request_line']}" + '" ' + \
                         f"{line['server_response']} {line['response_size_in_bytes']}" + ' "' + f"{line['referer']}" + '" ' + f"{line['user_agent']}\n")
         file.flush()
-
 
     engine = create_engine('postgresql://postgres:postgres@localhost:5432/postgres')
 
